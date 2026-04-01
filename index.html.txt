@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Billing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .products-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: #6c757d;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .quantity-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #0056b3;
+        }
+
+        .quantity-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .add-to-cart-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .cart-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .cart-total {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .generate-bill-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #17a2b8, #20c997);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .generate-bill-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .bill-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bill-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-bill {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .bill-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+        }
+
+        .bill-items {
+            margin-bottom: 30px;
+        }
+
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .bill-total {
+            font-size: 1.5em;
+            font-weight: bold;
+            border-top: 3px solid #28a745;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .whatsapp-btn {
+            width: 100%;
+            padding: 15px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Smart Shop Billing</h1>
+            <p>Fast billing with WhatsApp sharing</p>
+        </div>
+
+        <div class="main-content">
+            <div class="products-section">
+                <h2 style="margin-bottom: 20px; color: #333; font-size: 1.8em;">Products</h2>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="cart-section">
+                <h2 style="margin-bottom: 20px; color: #333; font-size: 1.8em;">Shopping Cart</h2>
+                <div id="cartItems"></div>
+                <div class="cart-total" id="cartTotal">
+                    Total: ₹0.00
+                </div>
+                <button class="generate-bill-btn" onclick="generateBill()" id="generateBillBtn" disabled>
+                    Generate Bill
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Modal -->
+    <div class="bill-modal" id="billModal">
+        <div class="bill-content">
+            <span class="close-bill" onclick="closeBill()">&times;</span>
+            <div class="bill-header">
+                <h2>🧾 Invoice / Bill</h2>
+                <p>Date: <span id="billDate"></span></p>
+                <p>Bill No: <span id="billNumber"></span></p>
+            </div>
+            <div class="bill-items" id="billItems"></div>
+            <div class="bill-total" id="billTotal"></div>
+            <button class="whatsapp-btn" onclick="sendToWhatsApp()">
+                📱 Send to WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Sample products data
+        const products = [
+            { id: 1, name: "Rice (5kg)", price: 350, emoji: "🍚" },
+            { id: 2, name: "Wheat Flour (5kg)", price: 280, emoji: "🌾" },
+            { id: 3, name: "Cooking Oil (1L)", price: 180, emoji: "🛢️" },
+            { id: 4, name: "Sugar (5kg)", price: 420, emoji: "🍬" },
+            { id: 5, name: "Milk (1L)", price: 65, emoji: "🥛" },
+            { id: 6, name: "Eggs (30 pcs)", price: 180, emoji: "🥚" },
+            { id: 7, name: "Onions (1kg)", price: 45, emoji: "🧅" },
+            { id: 8, name: "Tomatoes (1kg)", price: 38, emoji: "🍅" },
+            { id: 9, name: "Dalda/Ghee (1kg)", price: 650, emoji: "🧈" },
+            { id: 10, name: "Toor Dal (1kg)", price: 180, emoji: "🌰" },
+            { id: 11, name: "Basmati Rice (5kg)", price: 650, emoji: "🍚" },
+            { id: 12, name: "Sunflower Oil (5L)", price: 750, emoji: "🛢️" }
+        ];
+
+        let cart = {};
+
+        // Initialize the shop
+        function init() {
+            renderProducts();
+        }
+
+        // Render products
+        function renderProducts() {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${product.emoji}</div>
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">₹${product.price}</div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                        <span class="quantity-display">${cart[product.id]?.quantity || 0}</span>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.id})" 
+                            id="addBtn_${product.id}">
+                        Add to Cart
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Change quantity
+        function changeQuantity(productId, change) {
+            if (!cart[productId]) {
+                cart[productId] = { ...products.find(p => p.id === productId), quantity: 0 };
+            }
+            
+            cart[productId].quantity = Math.max(0, cart[productId].quantity + change);
+            
+            if (cart[productId].quantity === 0) {
+                delete cart[productId];
+            }
+            
+            renderProducts();
+            renderCart();
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!cart[productId]) {
+                cart[productId] = { ...product, quantity: 0 };
+            }
+            cart[productId].quantity += 1;
+            renderProducts();
+            renderCart();
+        }
+
+        // Render cart
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const generateBillBtn = document.getElementById('generateBillBtn');
+
+            const cartArray = Object.values(cart);
+            const total = cartArray.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            cartItems.innerHTML = cartArray.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div>₹${item.price} x ${item.quantity}</div>
+                    </div>
+                    <div class="cart-item-price">₹${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+
+            cartTotal.innerHTML = `Total: ₹${total.toFixed(2)}`;
+            generateBillBtn.disabled = total === 0;
+
+            // Update add buttons
+            Object.keys(cart).forEach(productId => {
+                const btn = document.getElementById(`addBtn_${productId}`);
+                if (btn) btn.textContent = 'In Cart ✓';
+            });
+        }
+
+        // Generate bill
+        function generateBill() {
+            const billDate = new Date().toLocaleString('en-IN', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            document.getElementById('billDate').textContent = billDate;
+            document.getElementById('billNumber').textContent = 'SH' + Date.now().toString().slice(-6);
+
+            const cartArray = Object.values(cart);
+            const billItems = document.getElementById('billItems');
+            const billTotal = document.getElementById('billTotal');
+
+            const total = cartArray.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            billItems.innerHTML = cartArray.map(item => `
+                <div class="bill-item">
+                    <span>${item.name} (${item.quantity}x)</span>
+                    <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            billTotal.innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Grand Total:</span>
+                    <span>₹${total.toFixed(2)}</span>
+                </div>
+            `;
+
+            document.getElementById('billModal').style.display = 'flex';
+        }
+
+        // Close bill
+        function closeBill() {
+            document.getElementById('billModal').style.display = 'none';
+        }
+
+        // Send to WhatsApp
+        function sendToWhatsApp() {
+            const cartArray = Object.values(cart);
+            const total = cartArray.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            let message = `*🧾 Shop Bill*\n\n`;
+            message += `📅 Date: ${document.getElementById('billDate').textContent}\n`;
+            message += `🧾 Bill No: ${document.getElementById('billNumber').textContent}\n\n`;
+            message += `*Items:*\n`;
+            
+            cartArray.forEach(item => {
+                message += `• ${item.name}\n  ${item.quantity}x ₹${item.price} = ₹${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+            
+            message += `\n💰 *Grand Total: ₹${total.toFixed(2)}*\n\n`;
+            message += `Thank you for shopping! 🛒✨`;
+
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initialize
+        init();
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('billModal');
+            if (event.target === modal) {
+                closeBill();
+            }
+        }
+    </script>
+</body>
+</html>
